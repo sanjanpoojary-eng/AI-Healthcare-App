@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Disease Prediction</title>
+    <style>
+        body {
+            font-family: 'Trebuchet MS', sans-serif;
+            background-image: url("static/bg1.jpg");
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed; /* Ensures the background image moves with the content */
+            margin: 0;
+            padding: 0;
+            overflow: hidden; /* Prevents scrollbars on the body */
+            display: flex; /* Use flexbox for centering */
+            justify-content: center; /* Center horizontally */
+            align-items: center; /* Center vertically */
+            height: 100vh; /* Full viewport height */
+        }
+        .container {
+            width: 40%; /* Set width as a percentage of the viewport width */
+            max-width: 1200px; /* Set a maximum width */
+            padding: 20px; 
+            background-color: rgba(148, 205, 230, 0.8); /* Semi-transparent white */
+            border-radius: 10px; 
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); 
+            font-family: 'Trebuchet MS', sans-serif;
+            font-weight: bold; /* Bold font weight */
+            box-sizing: border-box; /* Ensure padding is included in the width */
+        }
+        
+        h2 {
+            font-size:xx-large;
+            text-align: center; 
+            font-family: 'Trebuchet MS', sans-serif;
+            font-weight: bold; /* Bold font weight */
+        }
+        .form-group {
+            margin-bottom: 15px; 
+        }
+        .form-group label {
+            display: block; 
+            margin-bottom: 5px; 
+            font-family: 'Trebuchet MS', sans-serif;
+            font-weight: bold; /* Bold font weight */
+        }
+        .form-group select {
+            width: 100%; 
+            padding: 8px; 
+            font-family: 'Trebuchet MS', sans-serif;
+            font-weight: bold; /* Bold font weight */
+        }
+        .btn {
+            width: 100%; 
+            padding: 10px; 
+            background-color: #3a78f5; 
+            color: rgb(49, 48, 48); 
+            border: none; 
+            border-radius: 5px; 
+            cursor: pointer; 
+            font-family: 'Trebuchet MS', sans-serif;
+            font-weight: bold; /* Bold font weight */
+            font-size: larger
+        }
+        .btn:hover {
+            background-color: #4cae4c; 
+        }
+        .result {
+            text-align: center; 
+            margin-top: 20px; 
+            font-size: 25px; 
+            color: #ea0000; 
+            font-family: 'Trebuchet MS', sans-serif;
+            font-weight: bold; /* Bold font weight */
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Disease Prediction</h2>
+        <form method="POST">
+            <div class="form-group">
+                <label for="symptom1">Symptom 1:</label>
+                <select name="symptom1" id="symptom1" required>
+                    {% for symptom in symptoms %}
+                        <option value="{{ symptom }}" {% if selected_symptoms and selected_symptoms[0] == symptom %}selected{% endif %}>{{ symptom }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="symptom2">Symptom 2:</label>
+                <select name="symptom2" id="symptom2" required>
+                    {% for symptom in symptoms %}
+                        <option value="{{ symptom }}" {% if selected_symptoms and selected_symptoms[1] == symptom %}selected{% endif %}>{{ symptom }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="symptom3">Symptom 3:</label>
+                <select name="symptom3" id="symptom3" required>
+                    {% for symptom in symptoms %}
+                        <option value="{{ symptom }}" {% if selected_symptoms and selected_symptoms[2] == symptom %}selected{% endif %}>{{ symptom }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="model_choice">Model:</label>
+                <select name="model_choice" id="model_choice" required>
+                    <option value="RandomForest" {% if model_choice == 'RandomForest' %}selected{% endif %}>Random Forest</option>
+                    <option value="NaiveBayes" {% if model_choice == 'NaiveBayes' %}selected{% endif %}>Naive Bayes</option>
+                </select>
+            </div>
+            <button type="submit" class="btn">Predict Disease</button>
+        </form>
+        {% if disease %}
+        <div class="result">
+            <h3>Predicted Disease: {{ disease }}</h3>
+        </div>
+        {% endif %}
+    </div>
+</body>
+</html>

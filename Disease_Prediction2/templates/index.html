@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Disease Prediction</title>
+    <style>
+      /* General styling for input and container elements */
+      #age,
+      textarea {
+        width: 100%;
+        padding: 10px;
+        border: 2px solid #4e148c;
+        border-radius: 10px;
+        background-color: #1f1b2e;
+        color: #e0e0e0;
+        font-family: Arial, sans-serif;
+        font-size: large;
+        box-sizing: border-box;
+        resize: vertical;
+      }
+      #age:focus,
+      textarea:focus {
+        outline: none;
+        border-color: #bb86fc;
+        box-shadow: 0 0 10px rgba(187, 134, 252, 0.5);
+      }
+      body {
+        font-family: Arial, sans-serif;
+        background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+        background-size: 400% 400%;
+        animation: gradientBG 15s ease infinite;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        overflow: hidden;
+        color: #e0e0e0;
+      }
+      @keyframes gradientBG {
+        0% {
+          background-position: 0% 50%;
+        }
+        50% {
+          background-position: 100% 50%;
+        }
+        100% {
+          background-position: 0% 50%;
+        }
+      }
+      .container {
+        width: 60%;
+        height: 90%;
+        padding: 30px;
+        background-color: #1f1b2e;
+        border-radius: 15px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+        font-size: large;
+        border: 1px solid #4e148c;
+        overflow-y: scroll;
+        scrollbar-width: none;
+      }
+      .container::-webkit-scrollbar {
+        display: none;
+      }
+      h2 {
+        font-size: xx-large;
+        text-align: center;
+        color: #bb86fc;
+        margin-bottom: 20px;
+      }
+      .form-group,
+      .predictions {
+        margin-bottom: 20px;
+      }
+      .form-group label {
+        display: block;
+        margin-bottom: 8px;
+        color: #e0e0e0;
+      }
+      .form-group select,
+      .btn {
+        width: 100%;
+        padding: 10px;
+        border: 2px solid #4e148c;
+        border-radius: 10px;
+        background-color: #1f1b2e;
+        color: #e0e0e0;
+        font-family: Arial, sans-serif;
+        font-size: large;
+        box-sizing: border-box;
+        transition: background-color 0.3s ease, box-shadow 0.3s ease;
+      }
+      .form-group select:focus,
+      .btn:focus {
+        outline: none;
+        border-color: #bb86fc;
+        box-shadow: 0 0 10px rgba(187, 134, 252, 0.5);
+      }
+      .btn {
+        background-color: #4e148c;
+        color: #e0e0e0;
+        font-weight: bold;
+        cursor: pointer;
+      }
+      .btn:hover {
+        background-color: #7e39f1;
+        box-shadow: 0 0 10px rgba(126, 57, 241, 0.5);
+      }
+      .individual-prediction {
+        color: #bb86fc;
+        font-weight: bold;
+      }
+      .final-prediction {
+        color: #e0e0e0;
+        font-size: 1.2em;
+        font-weight: bold;
+        text-align: center;
+      }
+      .info-container {
+        opacity: 0;
+        height: 0;
+        overflow: hidden;
+        transition: opacity 0.5s ease, height 0.5s ease;
+        margin-top: 20px;
+      }
+      .info-container.visible {
+        opacity: 1;
+        height: auto;
+      }
+      .info-container h4 {
+        color: #bb86fc;
+        margin-top: 20px;
+      }
+      .info-container h5 {
+        color: #7e39f1;
+        margin-top: 15px;
+      }
+      .info-container p {
+        margin: 10px 0;
+        color: #e0e0e0;
+      }
+      .info-container ul {
+        margin: 10px 0;
+        padding-left: 20px;
+        color: #e0e0e0;
+      }
+      .show-info-btn {
+        background-color: #4e148c;
+        font-weight: bold;
+        width: 100%;
+        padding: 10px;
+        color: #e0e0e0;
+        border-radius: 10px;
+        cursor: pointer;
+        transition: background-color 0.3s ease, box-shadow 0.3s ease;
+        margin-top: 10px;
+        border: 2px solid #4e148c;
+      }
+      .show-info-btn:hover {
+        background-color: #7e39f1;
+        box-shadow: 0 0 10px rgba(126, 57, 241, 0.5);
+      }
+      .loader {
+        font-size: 1.5em;
+        font-weight: bold;
+        color: #bb86fc;
+        display: none;
+        text-align: center;
+      }
+      .loader::before {
+        content: "Predicting Your Disease...";
+        display: inline-block;
+        animation: blink 1s infinite;
+      }
+      @keyframes blink {
+        0%,
+        100% {
+          opacity: 1;
+        }
+        50% {
+          opacity: 0;
+        }
+      }
+      .container *:not(input):not(select):not(button):not(textarea) {
+        user-select: none;
+        cursor: default;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h2>
+        Personalized Predictive Healthcare Using Machine Learning and Generative
+        AI
+      </h2>
+      {% if not final_disease %}
+      <form method="POST" onsubmit="showLoader()">
+        <div class="form-group">
+          <label for="gender">Gender:</label>
+          <select name="gender" id="gender" required>
+            <option value="Male">Male</option>
+            <option value="Female">Female</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="age">Age:</label>
+          <input type="number" name="age" id="age" min="1" max="120" required />
+        </div>
+        <div class="form-group">
+          <label for="additional_info"
+            >Additional Information (optional):</label
+          >
+          <textarea
+            name="additional_info"
+            id="additional_info"
+            rows="4"
+            placeholder="Enter any additional information such as medical history, personal profile, or disease experience."
+          ></textarea>
+        </div>
+        <div class="form-group">
+          <label for="symptom1">Symptom 1:</label>
+          <select name="symptom1" id="symptom1" required>
+            {% for symptom in symptoms %}
+            <option value="{{ symptom }}">{{ symptom }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="symptom2">Symptom 2:</label>
+          <select name="symptom2" id="symptom2" required>
+            {% for symptom in symptoms %}
+            <option value="{{ symptom }}">{{ symptom }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="symptom3">Symptom 3:</label>
+          <select name="symptom3" id="symptom3" required>
+            {% for symptom in symptoms %}
+            <option value="{{ symptom }}">{{ symptom }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <button type="submit" class="btn" id="submit-btn">
+          Predict Disease
+        </button>
+      </form>
+      <div class="loader" id="loader"></div>
+      {% else %}
+      <div class="predictions">
+        <h3>Predictions by Each Model:</h3>
+        <ul>
+          {% for model, prediction in model_predictions.items() %}
+          <li class="individual-prediction">{{ model }}: {{ prediction }}</li>
+          {% endfor %}
+        </ul>
+        <div class="final-prediction">
+          <h3>Final Predicted Disease: {{ final_disease }}</h3>
+        </div>
+      </div>
+      <button class="show-info-btn" onclick="toggleInfo()">
+        About {{ final_disease }}
+      </button>
+      <div class="info-container" id="info-container">
+        <h4>About {{ final_disease }}</h4>
+        <div class="section">
+          <p>{{ disease_info|safe }}</p>
+        </div>
+      </div>
+      {% endif %}
+    </div>
+    <script>
+      function showLoader() {
+        document.getElementById("submit-btn").style.display = "none";
+        document.getElementById("loader").style.display = "block";
+      }
+      function toggleInfo() {
+        var infoContainer = document.getElementById("info-container");
+        infoContainer.classList.toggle("visible");
+      }
+    </script>
+  </body>
+</html>
